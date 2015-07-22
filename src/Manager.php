@@ -139,7 +139,6 @@ class Manager{
             foreach($tree as $locale => $groups){
                 if(isset($groups[$group])){
                     $translations = $groups[$group];
-//                    $path = $this->app->langPath().'/'.$locale.'/'.$group.'.php';
                     $path = $this->getPath($group, $locale);
                     $output = "<?php\n\nreturn ".var_export($translations, true).";\n";
                     $this->files->put($path, $output);
