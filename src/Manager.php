@@ -85,7 +85,6 @@ class Manager{
 
     public function findTranslations($path = null)
     {
-
         $path = $path ?: [base_path('app'), base_path('resources'), base_path('config')];
         $keys = array();
         $functions =  array('trans', 'trans_choice', 'Lang::get', 'Lang::choice', 'Lang::trans', 'Lang::transChoice', '@lang', '@choice');
