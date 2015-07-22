@@ -39,8 +39,13 @@ class Manager{
 
     public function importTranslations($replace = false)
     {
+        $dirs = $this->getDirectories();
         $counter = 0;
-        foreach($this->files->directories($this->app->langPath()) as $langPath){
+        foreach($dirs as $langPath){
+            $namespace = null;
+            if(strpos($langPath, 'Modules')){
+                $namespace = strtolower(basename(dirname(dirname($langPath))));
+            }
             $locale = basename($langPath);
 
             foreach($this->files->files($langPath) as $file){
@@ -52,13 +57,14 @@ class Manager{
                     continue;
                 }
 
-                $translations = \Lang::getLoader()->load($locale, $group);
+                $translations = \Lang::getLoader()->load($locale, $group, $namespace);
+
                 if ($translations && is_array($translations)) {
                     foreach(array_dot($translations) as $key => $value){
                         $value = (string) $value;
                         $translation = Translation::firstOrNew(array(
                             'locale' => $locale,
-                            'group' => $group,
+                            'group' => $namespace ? $namespace . '::' . $group : $group,
                             'key' => $key,
                         ));
 
@@ -81,6 +87,13 @@ class Manager{
             }
         }
         return $counter;
+    }
+
+    protected function getDirectories()
+    {
+        $modulesDirs = $this->files->directories(app_path('Modules/*/lang'));
+        $resourcesDirs = $this->files->directories($this->app->langPath());
+        return array_merge($modulesDirs, $resourcesDirs);
     }
 
     public function findTranslations($path = null)
