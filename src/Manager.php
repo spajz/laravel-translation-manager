@@ -86,7 +86,8 @@ class Manager{
     public function findTranslations($path = null)
     {
 
-        $path = $path ?: [base_path('app'), base_path('resources'), base_path('config')];
+
+        $path = $path ?: base_path();
         $keys = array();
         $functions =  array('trans', 'trans_choice', 'Lang::get', 'Lang::choice', 'Lang::trans', 'Lang::transChoice', '@lang', '@choice');
         $pattern =                              // See http://regexr.com/392hu
@@ -95,7 +96,7 @@ class Manager{
             "[\'\"]".                           // Match " or '
             "(".                                // Start a new group to match:
                 "[a-zA-Z0-9_-]+".               // Must start with group
-                "(([\.\:])[^\1)]+)+".                // Be followed by one or more items/keys
+                "([.][^\1)]+)+".                // Be followed by one or more items/keys
             ")".                                // Close group
             "[\'\"]".                           // Closing quote
             "[\),]";                            // Close parentheses or new parameter
@@ -114,7 +115,6 @@ class Manager{
                 }
             }
         }
-
         // Remove duplicates
         $keys = array_unique($keys);
 
@@ -140,26 +140,13 @@ class Manager{
             foreach($tree as $locale => $groups){
                 if(isset($groups[$group])){
                     $translations = $groups[$group];
-//                    $path = $this->app->langPath().'/'.$locale.'/'.$group.'.php';
-                    $path = $this->getPath($group, $locale);
+                    $path = $this->app->langPath().'/'.$locale.'/'.$group.'.php';
                     $output = "<?php\n\nreturn ".var_export($translations, true).";\n";
                     $this->files->put($path, $output);
                 }
             }
             Translation::where('group', $group)->whereNotNull('value')->update(array('status' => Translation::STATUS_SAVED));
         }
-    }
-
-    protected function getPath($group, $locale)
-    {
-        // Is module?
-        if(strpos($group, '::')){
-            $parts = explode('::', $group);
-            $path = $this->app->path(). '/Modules/' . ucfirst($parts[0]) . '/lang/'.$locale.'/'.$parts[1].'.php';
-        } else {
-            $path = $this->app->langPath().'/'.$locale.'/'.$group.'.php';
-        }
-        return $path;
     }
     
     public function exportAllTranslations()
