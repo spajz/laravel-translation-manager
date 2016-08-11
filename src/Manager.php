@@ -100,7 +100,7 @@ class Manager{
     {
         $path = $path ?: [base_path('app'), base_path('resources'), base_path('config')];
         $keys = array();
-        $functions =  array('trans', 'trans_choice', 'Lang::get', 'Lang::choice', 'Lang::trans', 'Lang::transChoice', '@lang', '@choice');
+        $functions =  array('trans', 'trans_choice', 'Lang::get', 'Lang::choice', 'Lang::trans', 'Lang::transChoice', '@lang', '@choice', 'trans2');
         $pattern =                              // See http://regexr.com/392hu
             "(".implode('|', $functions) .")".  // Must start with one of the functions
             "\(".                               // Match opening parenthese
